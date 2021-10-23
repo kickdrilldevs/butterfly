@@ -37,7 +37,7 @@ import org.json.JSONObject
  * Created by vyankatesh.jadhav on 3/8/2017.
  */
 
-abstract class VolleyWebServiceCaller<R>(private val context: ButterflyActivity) : Response.Listener<R>, Response.ErrorListener {
+abstract class VolleyWeb<R>(private val context: ButterflyActivity) : Response.Listener<R>, Response.ErrorListener {
 
 
     fun callJsonWebRequest(url: String, method: Int, param: JSONObject): Boolean {

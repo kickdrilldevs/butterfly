@@ -29,13 +29,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.app.butterfly.adaptermaker.ItemLayoutBinder
 import com.app.butterfly.butterfly.ButterflyActivity
 import com.app.butterfly.db.Model
+import com.app.butterfly.viewholders.ViewHolder
 
-import com.app.butterfly.viewholders.binder
+
 import java.util.*
 
 
@@ -43,8 +45,7 @@ import java.util.*
 class DataBindingRecycleViewAdapter<V : ViewDataBinding, M : Model>(
     internal var context: ButterflyActivity,
     var dataset: ArrayList<M>,
-    private val model: Int,
-    private val modelclickid: Int
+    private var layoutid: Int
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -72,13 +73,6 @@ class DataBindingRecycleViewAdapter<V : ViewDataBinding, M : Model>(
      * @see .onBindViewHolder
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        try {
-            val ai = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
-            Log.e("name", context.getActualTypeArgumentClassName<ViewDataBinding>())
-            layoutid = ai.metaData.get(context.getActualTypeArgumentClassName<ViewDataBinding>()) as Int
-        } catch (e: Exception) {
-            Log.e("error", "You Must Provide layout name in a android Manifest", e)
-        }
 
         if (layoutid == -1) {
             try {
@@ -88,8 +82,8 @@ class DataBindingRecycleViewAdapter<V : ViewDataBinding, M : Model>(
             }
 
         }
-        val view = LayoutInflater.from(context).inflate(layoutid, parent, false)
-        return object : RecyclerView.ViewHolder(view) {}
+        val view = DataBindingUtil.inflate<V>(LayoutInflater.from(context), layoutid, parent, false)
+        return ViewHolder(view.root,view)
     }
 
     /**
@@ -114,14 +108,9 @@ class DataBindingRecycleViewAdapter<V : ViewDataBinding, M : Model>(
      * @param position The position of the item within the adapter's data set.
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (model > 0) {
-            holder?.binder?.setVariable(model, dataset[position])
-        }
-        if (modelclickid > 0) {
-            holder?.binder?.setVariable(modelclickid, adapterItemLayoutBinder)
-        }
+
         if (adapterItemLayoutBinder != null) {
-            adapterItemLayoutBinder!!.onBindViewHolder(holder?.binder as V, dataset[position])
+            adapterItemLayoutBinder!!.onBindViewHolder((holder as ViewHolder)?.binder as V, dataset[position])
         } else {
             try {
                 throw Exception("You must provide databinding onclicklistener")
@@ -137,7 +126,7 @@ class DataBindingRecycleViewAdapter<V : ViewDataBinding, M : Model>(
             field = value
         }
 
-    internal var layoutid: Int = 0
+
 
     /**
      * Returns the total number of items in the data set held by the adapter.

@@ -41,12 +41,10 @@ import java.util.*
 
 class DataBindingBaseAdapter<V : ViewDataBinding, M : Model>(
     var pojos: ArrayList<M>,
-    internal var context: ButterflyActivity,
-    private val model: Int,
-    private val modelclickid: Int
+    internal var context: ButterflyActivity
 ) : BaseAdapter() {
-    internal var layoutid = -1
-    internal var inflater: LayoutInflater
+    public var layoutid = -1
+    public var inflater: LayoutInflater
 
     var adapterItemLayoutBinder: ItemLayoutBinder<V, M>? = null
         set(value) {
@@ -75,7 +73,7 @@ class DataBindingBaseAdapter<V : ViewDataBinding, M : Model>(
         val Model: M = pojos[position]
         if (layoutid == -1) {
             try {
-                throw Exception("You Must provide layoutid ")
+                throw Exception("Must provide layoutid ")
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -87,12 +85,6 @@ class DataBindingBaseAdapter<V : ViewDataBinding, M : Model>(
             convertView!!.tag = viewHolder
         } else {
             viewHolder = convertView.tag as V
-        }
-        if (model > 0) {
-            viewHolder!!.setVariable(model, Model)
-        }
-        if (modelclickid > 0) {
-            viewHolder!!.setVariable(modelclickid, adapterItemLayoutBinder)
         }
         if (adapterItemLayoutBinder != null) {
             if (viewHolder != null) {

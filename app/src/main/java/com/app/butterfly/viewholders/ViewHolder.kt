@@ -26,12 +26,17 @@ import android.app.Activity
 import android.content.ContextWrapper
 
 import android.view.View
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.app.butterfly.butterfly.ButterflyActivity
 
 
-class ViewHolder(var view: View): RecyclerView.ViewHolder(view) {
+class ViewHolder(var view: View, var binder: ViewDataBinding): RecyclerView.ViewHolder(view) {
+
     var butterflyActivity: ButterflyActivity
+
+
 
     init {
         if (view.context is Activity) {
@@ -40,5 +45,6 @@ class ViewHolder(var view: View): RecyclerView.ViewHolder(view) {
             butterflyActivity = (view.context as ContextWrapper)
                 .baseContext as ButterflyActivity
         }
+
     }
 }

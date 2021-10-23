@@ -50,7 +50,7 @@ abstract class RetroFitWeb<R : Model>(
 
 
 
-    abstract var dialog: ProgressDialog
+
 
     init {
         val okHttpClient = OkHttpClient().newBuilder()
@@ -69,16 +69,10 @@ abstract class RetroFitWeb<R : Model>(
      * it's method used for calling Web Services using
      * Retrofit api with Taking Response.
      */
-    fun callRetrofitWebService(vararg webparams: Any): Boolean {
+    fun callRetrofitWebService(): Boolean {
         try {
-
             if (context.isConnectingToInternet!!) {
-                dialog = ProgressDialog(context)
-                dialog.setMessage("Please Wait...")
-                dialog.setCancelable(false)
-                dialog.setCanceledOnTouchOutside(false)
-                dialog.show()
-                val call = callWebService(*webparams)
+                val call = callWebService()
                 call.enqueue(this)
                 return true
             } else {
@@ -86,7 +80,6 @@ abstract class RetroFitWeb<R : Model>(
                 return false
             }
         } catch (e: Exception) {
-            dialog.dismiss()
             return false
         }
 
@@ -103,16 +96,10 @@ abstract class RetroFitWeb<R : Model>(
      *
      * @return
      */
-    abstract fun callWebService(vararg webparams: Any): Call<R>
+    abstract fun callWebService(): Call<R>
 
     override fun onResponse(call: Call<R>, response: Response<R>) {
         Log.e("request url : ", call.request().url().toString())
-        try {
-            dialog.dismiss()
-        } catch (ex: Exception) {
-            Log.e("error", ex.message, ex)
-        }
-
         setResponse(call, response)
     }
 
@@ -126,7 +113,6 @@ abstract class RetroFitWeb<R : Model>(
 
 
     override fun onFailure(call: Call<R>, t: Throwable) {
-        dialog.dismiss()
         Log.e("request url : ", call.request().url().toString())
         if (t is SocketTimeoutException) {
             onTimeout(call, t)
