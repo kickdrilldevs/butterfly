@@ -50,17 +50,7 @@ abstract class RetrofitFragment<R> : ButterflyFragment(), Callback<R> {
      */
     abstract protected var retrofit: Retrofit
 
-    var apiclass: Class<*>? = null
 
-    var defaultloader: Boolean = false
-
-    abstract var dialog: ProgressDialog
-
-    /**
-     *
-     *
-     */
-    protected var gsonBuilder: GsonBuilder? = null
 
 
     var okHttpClient: OkHttpClient? = null
@@ -72,14 +62,7 @@ abstract class RetrofitFragment<R> : ButterflyFragment(), Callback<R> {
     }
 
     private fun initRetrofit() {
-        dialog = ProgressDialog(activity)
-        dialog.setMessage("Please wait...")
-        dialog.setCancelable(false)
-        dialog.setCanceledOnTouchOutside(false)
-        defaultloader = true
-        if (gsonBuilder == null) {
-            gsonBuilder = GsonBuilder()
-        }
+
         if (okHttpClient == null) {
             okHttpClient = OkHttpClient().newBuilder()
                 .connectTimeout(60, TimeUnit.SECONDS)
@@ -90,22 +73,18 @@ abstract class RetrofitFragment<R> : ButterflyFragment(), Callback<R> {
         retrofit = Retrofit.Builder()
             .baseUrl(base_url)
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create(gsonBuilder!!.create()))
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
-    fun <T> getApi(): Any? {
-        return retrofit.create(apiclass)
-    }
+
 
     /**
      * it's method used for calling Web Services using Retrofit api with Taking Response.
      */
-    protected fun callRetrofitServices(call: Call<R>, vararg params: Any): Boolean {
+    protected fun callRetrofitServices(): Boolean {
         if (activity?.isConnectingToInternet!!) {
-            if (defaultloader) {
-                dialog.show()
-            }
+            var call: Call<R> = createWebService()
             call.enqueue(this)
             return true
         } else {
@@ -115,13 +94,18 @@ abstract class RetrofitFragment<R> : ButterflyFragment(), Callback<R> {
     }
 
     /**
+     * it's method is for when create or call
+     * api method in retrofit
+     */
+    abstract fun createWebService(): Call<R>
+
+    /**
      * it's method is for when device is at offline or state.
      */
     protected abstract fun atDeviceOffline()
 
 
     override fun onResponse(call: Call<R>, response: Response<R>) {
-        dialog.dismiss()
         setResponse(call, response)
     }
 
@@ -134,7 +118,6 @@ abstract class RetrofitFragment<R> : ButterflyFragment(), Callback<R> {
     protected abstract fun setResponse(call: Call<R>, response: Response<R>)
 
     override fun onFailure(call: Call<R>, t: Throwable) {
-        dialog.dismiss()
         if (t is SocketTimeoutException) {
             onTimeout(call, t)
         } else {

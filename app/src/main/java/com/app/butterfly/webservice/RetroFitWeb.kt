@@ -22,7 +22,6 @@
 
 package com.app.butterfly.webservice
 
-import android.app.ProgressDialog
 import android.util.Log
 import com.app.butterfly.db.Model
 import com.app.butterfly.butterfly.ButterflyActivity
